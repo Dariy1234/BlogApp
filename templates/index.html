@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>BlogApp:Home</title>
+<link rel="stylesheet" href="/static/css/style.css">
+{% endblock %}
+
+{% block content %}
+{% if top_post %}
+<header style="
+        background:
+            linear-gradient(
+                45deg,
+                rgba(0, 0, 0, 0.8),
+                rgba(0, 0, 0, 0.3)
+            ),
+            url('{% if top_post.image %} {{top_post.image.url}} {% else %} /static/images/post-view-image.png {% endif %}');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    ">
+    <div class="header-content">
+        <p class="header-category">posted on <strong>{{top_post.category.title}}</strong></p>
+        <h1>{{top_post.title}}</h1>
+        <p class="header-author">
+            By <strong>{{top_post.author}}</strong> | {{top_post.created_at}}
+        </p>
+        <p class="header-description">
+            {{top_post.short_description}}
+        </p>
+        <a href="{% url 'post_d
+        
+        3цetails' post_id=top_post.id %}" class="main-btn">Read More ></a>
+    </div>
+</header>
+{% endif %}
+
+
+<div class="container">
+    <div class="posts-block">
+        <div class="posts-view">
+            <h3>Featured Post</h3>
+            {%for post in posts%}
+            <div class="post" id="post-{{post.id}}">
+
+                <p class="post-author">
+                    By <strong>{{post.author}}</strong>| {{post.created_at}}
+                </p>
+                <h4 class="post-title">
+                    {{post.title}}</h4>
+                <p class="post-rating">
+                    {% with post.avg_rating|default:0 as raw_avg %}
+                    {% with raw_avg|floatformat:0 as avg_int %}
+                    {% for i in "12345" %}
+                    <span class="star {% if forloop.counter <= avg_int|add:" 0" %}filled{% endif %}">★</span>
+                    {% endfor %}
+                    <span class="rating-value">{{ avg_int }}/5</span>
+                    {% endwith %}
+                    {% endwith %}
+                </p>
+                <p class="post-description">{{post.short_description}}</p>
+                <a href="{% url 'post_detail' post_id=post.id %}" class="main-btn">Read More </a>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="posts-list">
+            <div class="posts-list-header">
+                <h3>All Posts</h3>
+                <a href="{% url 'all_posts' %}">View All > </a>
+            </div>
+            {% for post in posts %}
+            <div class="post-list-item" data-post-id="{{post.id}}">
+                <p class="post-author">
+                    By <strong>James West</strong> | May 23, 2022
+                </p>
+                <h5 class="post-title"> {{post.title}} </h5>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="categories">
+        <h2 class="categories-title">All Categories</h2>
+
+        <div class="category-list">
+            {% for category in categories %}
+            <a href="{% url 'all_posts' %}?category_id={{ post.category.id }}" class="category">
+                <div class="category-icon">{{ category.icon|safe }}</div>
+                <h3 class="category-title">{{ category.title }}</h3>
+                <p class="category-description">{{ category.short_description }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% include 'includes/join_team.html' %}
+
+</div>
+
+
+
+<script>
+    function hideAllPosts(posts) {
+        posts.forEach((post) => {
+            post.style.display = "none";
+        });
+    }
+    document.addEventListener("DOMContentLoaded", () => {
+        let postItems = document.querySelectorAll(".post-list-item");
+        console.log("Post items: ", postItems);
+        let posts = document.querySelectorAll(".post");
+        postItems.forEach((postItem) => {
+            console.log("Item: ", postItem);
+
+            postItem.addEventListener("click", () => {
+                console.log("Clicked to: ", postItem);
+
+                let postId = postItem.dataset.postId;
+                console.log("Clicked post id: ", postId);
+
+                let post = document.querySelector(`#post-${postId}`);
+                console.log("Found post element: ", post);
+
+                hideAllPosts(posts);
+                post.style.display = "block";
+            });
+
+
+        });
+    });
+</script>
+
+{% endblock %}

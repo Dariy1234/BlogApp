@@ -1,0 +1,233 @@
+@import url('https://fonts.googleapis.com/css2?family=Sen:wght@400..800&display=swap');
+
+h1 {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 64px;
+}
+
+h2 {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 48px;
+}
+
+h3 {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 36px;
+}
+
+h4 {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+}
+
+h5 {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 32px;
+}
+
+body {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 28px;
+    background-color: #00000000;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    cursor: pointer;
+}
+
+.nav {
+    background: #232536;
+    color: white;
+    padding: 5px 70px;
+
+    display: flex;
+    align-items: center;
+}
+
+.nav h2 {
+    flex: 1 1;
+}
+
+.nav-right {
+    flex: 1 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    justify-content: flex-end;
+}
+
+.nav-right-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-right-link {
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 28px;
+}
+
+.main-btn {
+    display: inline-block;
+    color: black;
+    background: #ffd050;
+    border: none;
+    padding: 7px 25px;
+    cursor: pointer;
+    font-family: "Sen", sans-serif;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 30px;
+    transition: all 0.3s ease;
+}
+.main-btn:hover {
+    background: #EDC14A;
+    transform: scale(1.1);
+}
+
+.container {
+    width: 90%;
+    margin: 0 auto;
+    
+}
+
+footer {
+    background: #232536;
+    color: white;
+   
+    padding: 20px 0;
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    
+    gap: 10px;
+
+
+
+}
+
+.join-team {
+    width: 50%;
+    margin: 50px auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+}
+.subscribe {
+    margin-top: 40px;
+    background-color: #303140;
+    padding: 50px 100px;
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.subscribe-form {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+}
+
+.subscribe-form input {
+    background-color: #303140;
+    border: 1px solid #4C4C4C;
+    padding: 7px 25px;
+    font-size: 18px;
+    line-height: 30px;
+    color: white;
+}
+
+.subscribe-form input:active {
+    border: 1px solid #4C4C4C;
+    outline: none;
+
+}
+
+.subscribe-form input:focus {
+    border: 1px solid #4C4C4C;
+    outline: none;
+}
+
+.categories {
+    margin-top: 50px;
+}
+
+.category-list {
+    margin-top: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+.category {
+    width: 200px;
+    height: 200px;
+    padding: 20px;
+    border: 1px solid #F4F4F4;
+    box-shadow: 5px 4px 3px 1px rgba(0, 0, 0, 0.22);
+    -webkit-box-shadow: 5px 4px 3px 1px rgba(0, 0, 0, 0.22);
+    -moz-box-shadow: 5px 4px 3px 1px rgba(0, 0, 0, 0.22);
+}
+
+.category-icon {
+    width: 60px;
+    height: 60px;
+    background-color: #F4F4F4;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.category-icon svg {
+    width: 50px;
+    height: 50px;
+}
+
+.category-description {
+    color: #6D6E76;
+}
+
+.categories {
+    margin-top: 50px;
+}
+
+.category-title {
+    text-wrap: unset;
+    overflow: hidden;
+    height: 40px;
+}
+
+.category.active {
+    background-color: #FFD050;
+    border-color: #FFD050;
+}

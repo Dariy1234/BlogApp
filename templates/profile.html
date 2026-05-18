@@ -1,0 +1,495 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+<title>{{ profile_user.username }} - Profile</title>
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    {% csrf_token %}
+    <div class="content-container">
+        <div class="author">
+            <div class="profile-header-image">
+                <img id="avatar"
+                    src="{% if profile_user.profile.profile_picture %} /media/{{profile_user.profile.profile_picture}} {% else %} /static/images/author.png {% endif %}"
+                    alt>
+                <button id="editImageBtn" onclick="document.getElementById('avatarInput').click()">✏️</button>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+            </div>
+            <div class="author-name">
+                <input class="username" name="username" type="text" value="{{profile_user.username}}"
+                    placeholder="Create your username here.." />
+                <p>{{ profile_user.date_joined|date:"d F Y" }}</p>
+
+            </div>
+
+        </div>
+
+
+        <h1 class="profile-title">Profile</h1>
+
+        <div class="profile-info-section">
+            <input class="email" type="email" value="{{profile_user.email}}" name="email"
+                placeholder="Enter your email here...">
+        </div>
+        {% if profile_user == request.user %}
+        <button class="main-btn" id="editProfile">Edit</button>
+        {% endif %}
+
+        {% if request.user.is_authenticated and profile_user != request.user %}
+        <button class="main-btn" id="subscribeBtn" data-author-id="{{profile_user.id}}">Subscribe</button>
+        {% endif %}
+        <div style="display: none; gap: 20px; align-items: center;" id="confirmButtons">
+            <button class="main-btn" style="background-color: #f09819;" id="calcelEditProfile">Cancel</button>
+            <button class="main-btn" id="saveEditProfile">Save</button>
+        </div>
+    </div>
+
+    <div class="profile-stats">
+        <input class="bio" name="bio" type="text" value="{{profile_user.bio}}"
+            placeholder="Create a small description about yourself here.." />
+        <div class="stat-item">
+            <div class="stat-number">{{ posts_count }}</div>
+            <div class="stat-label">Posts</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ comments_count }}</div>
+            <div class="stat-label">Comments</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" id="subscribers-count">{{ subscribers_count }}</div>
+            <div class="stat-label">Subscribers</div>
+        </div>
+        <div class="stat-item">
+            <div class="post-rating" style="font-size: 20px;">
+                {% with author_avg_rating|floatformat:0 as avg_int %}
+                <span class="star filled">★</span>
+                <span class="rating-value">{{ avg_int }}/5</span>
+                {% endwith %}
+            </div>
+            <div class="stat-label">Post Rating</div>
+        </div>
+    </div>
+
+    <div class="posts-section">
+
+        {% if profile_user == request.user %}
+        <div class="posts-section-buttons">
+            <button class="active" id="my-posts-btn">My Posts</button>
+            <button id="favourite-posts-btn"> Favourite Posts </button>
+            <button><a href="{% url 'post_creation' %}">Create Post</a></button>
+        </div>
+        {% else %}
+        <h2>Posts</h2>
+        {% endif%}
+
+
+        <div class="similar-posts" id="my-posts">
+            {% for post in user_posts %}
+            <div class="similar-post" id="post-{{post.id}}">
+
+                <p class="similar-post-author">By <strong>{{post.author.username }}</strong></p>
+                <div class="post-category">
+                    <div class="post-category-icon">{{ post.category.icon|safe }}</div>
+                    <h4 class="post-category-title">{{ post.category.title }}</h4>
+                </div>
+                <a class="similar-post-title" href="{% url 'post_detail' post.id %}">{{ post.title}}</a>
+                <div class="post-header-with-save ">
+
+                    <p class="post-rating">
+                        {% with post.average_rating as raw_avg %}
+                        {% with raw_avg|floatformat:0 as avg_int %}
+                        {% for i in "12345" %}
+                        <span class="star {% if forloop.counter <= avg_int|add:" 0" %}filled{% endif %}">★</span>
+                        {% endfor %}
+                        <span class="rating-value">{{ avg_int }}/5</span>
+                        {% endwith %}
+                        {% endwith %}
+                    </p>
+                    <button class="save-post-small" onclick="deletePost('{{post.id}}')">
+                        <svg width="64px" height="64px" viewBox="0 0 1024 1024" class="icon" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" fill="#000000">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M667.8 362.1H304V830c0 28.2 23 51 51.3 51h312.4c28.4 0 51.4-22.8 51.4-51V362.2h-51.3z"
+                                    fill="#CCCCCC"></path>
+                                <path
+                                    d="M750.3 295.2c0-8.9-7.6-16.1-17-16.1H289.9c-9.4 0-17 7.2-17 16.1v50.9c0 8.9 7.6 16.1 17 16.1h443.4c9.4 0 17-7.2 17-16.1v-50.9z"
+                                    fill="#CCCCCC"></path>
+                                <path
+                                    d="M733.3 258.3H626.6V196c0-11.5-9.3-20.8-20.8-20.8H419.1c-11.5 0-20.8 9.3-20.8 20.8v62.3H289.9c-20.8 0-37.7 16.5-37.7 36.8V346c0 18.1 13.5 33.1 31.1 36.2V830c0 39.6 32.3 71.8 72.1 71.8h312.4c39.8 0 72.1-32.2 72.1-71.8V382.2c17.7-3.1 31.1-18.1 31.1-36.2v-50.9c0.1-20.2-16.9-36.8-37.7-36.8z m-293.5-41.5h145.3v41.5H439.8v-41.5z m-146.2 83.1H729.5v41.5H293.6v-41.5z m404.8 530.2c0 16.7-13.7 30.3-30.6 30.3H355.4c-16.9 0-30.6-13.6-30.6-30.3V382.9h373.6v447.2z"
+                                    fill="#211F1E"></path>
+                                <path
+                                    d="M511.6 798.9c11.5 0 20.8-9.3 20.8-20.8V466.8c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0 11.4 9.3 20.7 20.8 20.7zM407.8 798.9c11.5 0 20.8-9.3 20.8-20.8V466.8c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0.1 11.4 9.4 20.7 20.8 20.7zM615.4 799.6c11.5 0 20.8-9.3 20.8-20.8V467.4c0-11.5-9.3-20.8-20.8-20.8s-20.8 9.3-20.8 20.8v311.4c0 11.5 9.3 20.8 20.8 20.8z"
+                                    fill="#211F1E"></path>
+                            </g>
+                        </svg>
+                    </button>
+
+                    <a href="{% url 'edit_post' post_id=post.id %}" class="save-post edit-post">
+                        <button><svg fill="#000000" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" width="12px" height="12px"
+                                viewBox="0 0 494.936 494.936" xml:space="preserve" stroke="#000000">
+                                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                <g id="SVGRepo_iconCarrier">
+                                    <g>
+                                        <g>
+                                            <path
+                                                d="M389.844,182.85c-6.743,0-12.21,5.467-12.21,12.21v222.968c0,23.562-19.174,42.735-42.736,42.735H67.157 c-23.562,0-42.736-19.174-42.736-42.735V150.285c0-23.562,19.174-42.735,42.736-42.735h267.741c6.743,0,12.21-5.467,12.21-12.21 s-5.467-12.21-12.21-12.21H67.157C30.126,83.13,0,113.255,0,150.285v267.743c0,37.029,30.126,67.155,67.157,67.155h267.741 c37.03,0,67.156-30.126,67.156-67.155V195.061C402.054,188.318,396.587,182.85,389.844,182.85z">
+                                            </path>
+                                            <path
+                                                d="M483.876,20.791c-14.72-14.72-38.669-14.714-53.377,0L221.352,229.944c-0.28,0.28-3.434,3.559-4.251,5.396l-28.963,65.069 c-2.057,4.619-1.056,10.027,2.521,13.6c2.337,2.336,5.461,3.576,8.639,3.576c1.675,0,3.362-0.346,4.96-1.057l65.07-28.963 c1.83-0.815,5.114-3.97,5.396-4.25L483.876,74.169c7.131-7.131,11.06-16.61,11.06-26.692 C494.936,37.396,491.007,27.915,483.876,20.791z M466.61,56.897L257.457,266.05c-0.035,0.036-0.055,0.078-0.089,0.107 l-33.989,15.131L238.51,247.3c0.03-0.036,0.071-0.055,0.107-0.09L447.765,38.058c5.038-5.039,13.819-5.033,18.846,0.005 c2.518,2.51,3.905,5.855,3.905,9.414C470.516,51.036,469.127,54.38,466.61,56.897z">
+                                            </path>
+                                        </g>
+                                    </g>
+                                </g>
+                            </svg></button>
+                    </a>
+
+                </div>
+
+                <p class="similar-post-description">{{ post.short_description|truncatewords:15 }}</p>
+                <p class="similar-post-date">{{ post.created_at|date:"d F Y" }}</p>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>You haven't written any posts yet.</p>
+                <a href="{% url 'post_creation' %}" class="nav-right-link">Create Post</a>
+            </div>
+            {% endfor %}
+
+        </div>
+
+
+
+
+
+
+        <div class="similar-posts" id="favourite-posts" style="display: none;">
+            {% for fav in favourite_posts %}
+            <div class="similar-post">
+
+                <p class="similar-post-author">By <strong>{{ fav.post.author.username }}</strong></p>
+                <div class="post-category">
+                    <div class="post-category-icon">{{ fav.post.category.icon|safe }}</div>
+                    <h4 class="post-category-title">{{ fav.post.category.title }}</h4>
+                </div>
+                <a class="similar-post-title" href="{% url 'post_detail' fav.post.id %}">{{ fav.post.title}}</a>
+                <div class="post-header-with-save">
+
+                    <p class="post-rating">
+                        {% with fav.post.average_rating as raw_avg %}
+                        {% with raw_avg|floatformat:0 as avg_int %}
+                        {% for i in "12345" %}
+                        <span class="star {% if forloop.counter <= avg_int|add:" 0" %}filled{% endif %}">★</span>
+                        {% endfor %}
+                        <span class="rating-value">{{ avg_int }}/5</span>
+                        {% endwith %}
+                        {% endwith %}
+                    </p>
+                    <button class="save-post-small" onclick="deleteFavouritePost({{ fav.post.id }},this)">
+                        <svg width="24px" height="24px" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
+                            style="fill: #FFD050;">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M17 3C18.1046 3 19 3.89543 19 5L19 19.0536C19 20.5893 17.341 21.552 16.0077 20.7901L12.9923 19.067C12.3774 18.7157 11.6226 18.7157 11.0077 19.067L7.99228 20.7901C6.65897 21.552 5 20.5893 5 19.0536L5 5C5 3.89543 5.89543 3 7 3L17 3Z"
+                                    stroke="#323232" stroke-width="2" stroke-linejoin="round"></path>
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+                <p class="similar-post-description">{{ fav.post.short_description|truncatewords:15 }}</p>
+                <p class="similar-post-date">{{ fav.post.created_at|date:"d F Y" }}</p>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <p>You haven't saved any posts yet.</p>
+                <a href="{% url 'all_posts' %}" class="btn-create">Browse Posts</a>
+            </div>
+            {% endfor %}
+        </div>
+
+
+
+
+
+
+    </div>
+</div>
+<div class="comments-section">
+    <h2>Recent Comments</h2>
+    {% if user_comments %}
+    <div class="comments-list">
+        {% for comment in user_comments|slice:":5" %}
+        <div class="comment-item">
+            <p class="comment-post"><strong>On:</strong> <a href="{% url 'post_detail' comment.post.id %}">
+                    {{comment.post.title }}</a></p>
+            <p class="comment-rating">Rating: {{ comment.rating }}/5 ★</p>
+            <p class="comment-content">{{ comment.content }}</p>
+            <p class="comment-date">{{ comment.created_at|date:"d F Y, H:i" }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No comments yet.</p>
+    {% endif %}
+</div>
+
+</div>
+
+<script>
+
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const myPostsBtn = document.querySelector("#my-posts-btn");
+        const favouritePostsBtn = document.querySelector("#favourite-posts-btn");
+
+        const myPosts = document.querySelector("#my-posts");
+        const favouritePosts = document.querySelector("#favourite-posts");
+        const csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]").value;
+        const usernameInput = document.querySelector("input.username");
+        const emailInput = document.querySelector("input.email")
+        const editProfileBnt = document.querySelector("button#editProfile");
+        const bioInput = document.querySelector("input.bio");
+        const confirmButtons = document.querySelector("div#confirmButtons");
+        const cancelBtn = confirmButtons.querySelector("#calcelEditProfile");
+        const saveBtn = confirmButtons.querySelector("#saveEditProfile");
+        const editImageBtn = document.querySelector("button#editImageBtn");
+        const avatarInput = document.querySelector("input#avatarInput");
+        const avatar = document.querySelector("img#avatar");
+        if (usernameInput) { usernameInput.disabled = true; }
+        if (emailInput) { emailInput.disabled = true; }
+        if (bioInput) { bioInput.disabled = true; }
+
+
+        editProfileBnt?.addEventListener("click", () => {
+            usernameInput.classList.add("editable")
+            usernameInput.disabled = false;
+
+            emailInput.classList.add("editable")
+            emailInput.disabled = false;
+
+            bioInput.classList.add("editable")
+            bioInput.disabled = false;
+
+            editImageBtn.classList.add("editable")
+
+            editProfileBnt.style.display = "none";
+            confirmButtons.style.display = "flex";
+        })
+
+        cancelBtn?.addEventListener("click", () => {
+            usernameInput.classList.remove("editable")
+            usernameInput.disabled = true;
+            usernameInput.value = "{{profile_user.username}}";
+
+            emailInput.classList.remove("editable")
+            emailInput.disabled = true;
+            emailInput.value = "{{profile_user.email}}";
+
+            bioInput.classList.remove("editable")
+            bioInput.disabled = true;
+            bioInput.value = "{{profile_user.bio}}";
+
+            editImageBtn.classList.remove("editable")
+
+            avatar.src = "{% if user.profile.profile_picture %} /media/{{user.profile.profile_picture}} {% else %} /static/images/author.png {% endif %}"
+
+            editProfileBnt.style.display = "block";
+            confirmButtons.style.display = "none";
+        })
+
+        avatarInput?.addEventListener("change", function () {
+            const file = this.files[0];
+
+            if (file) {
+                avatar.src = URL.createObjectURL(file);
+            }
+        })
+
+        saveBtn?.addEventListener("click", () => {
+            const formData = new FormData();
+
+            formData.append("username", usernameInput.value);
+            formData.append("email", emailInput.value);
+            formData.append("bio", bioInput.value);
+
+            if (avatarInput.files[0]) {
+                formData.append("avatar", avatarInput.files[0])
+            }
+
+            console.log("UPDATE PROFILE FORM DATA: ", formData);
+            fetch("{% url 'edit_profile' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                },
+                body: formData
+            })
+                .then(response => response.json())
+
+                .then(data => {
+                    console.log("UPDATE PROFILE RESPONSE: ", data)
+
+                    if (data.status === "success") {
+                        cancelBtn.click();
+                        const currentUsername = "{{user.username}}";
+                        const user = data.user;
+
+                        usernameInput.value = user.username;
+                        emailInput.value = user.email;
+                        bioInput.value = user.bio;
+                        if (currentUsername !== user.username) {
+                            window.location.href = `/profile/${user.username}`;
+                            return
+                        }
+                        if (user.avatar) {
+                            avatar.src = user.avatar
+                        }
+                        avatarInput.value = null;
+                    } else {
+                        alert(data.error || "Something went wrong. Try again later!")
+                    }
+                }).catch((e) => {
+                    console.error("FAILED UPDATE PROFILE:", e);
+                })
+
+        });
+
+        favouritePostsBtn?.addEventListener("click", () => {
+            favouritePostsBtn.classList.add("active")
+            myPostsBtn.classList.remove("active")
+
+            myPosts.style.display = "none";
+            favouritePosts.style.display = "flex"
+        })
+
+        myPostsBtn?.addEventListener("click", () => {
+            myPostsBtn.classList.add("active")
+            favouritePostsBtn.classList.remove("active")
+
+            favouritePosts.style.display = "none";
+            myPosts.style.display = "flex"
+        })
+        
+        
+        const subscribeBtn = document.querySelector("#subscribeBtn");
+        const subscribersCountElement = document.querySelector("#subscribers-count");
+
+        subscribeBtn?.addEventListener("click", () => {
+            const authorId = subscribeBtn.dataset.authorId;
+
+            const url = `/authors/${authorId}/subscription/toggle/`;
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === "subscribed") {
+                        subscribeBtn.textContent = "Unsubscribe";
+                        subscribeBtn.style.backgroundColor = "white";
+                        subscribeBtn.style.color = "#FFD050";
+                        subscribersCountElement.textContent = parseInt(subscribersCountElement.textContent) + 1;
+                    } else if (data.status === "unsubscribed") {
+                        subscribeBtn.textContent = "Subscribe";
+                        subscribeBtn.style.backgroundColor = "#FFD050";
+                        subscribeBtn.style.color = "black";
+                        subscribersCountElement.textContent = parseInt(subscribersCountElement.textContent) - 1;
+                    }
+                })
+                .catch(e => {
+                    console.log("Failed to subscribe: ", e);
+                })
+        })
+    })
+
+
+
+    function showEmptyFavouritePosts() {
+        const favBlock = document.querySelector("#favourite-posts")
+        const favPosts = favBlock.querySelectorAll("*");
+
+        if (favPosts.length > 0) {
+            return
+        }
+
+        favBlock.innerHTML = `
+        <div class="empty-state">
+                <p>You haven't saved any posts yet.</p>
+                <a href="{% url 'all_posts' %}" class="btn-create">Browse Posts</a>
+            </div>
+    `;
+    }
+
+    function deleteFavouritePost(post_id, btn) {
+        console.log("Delete post: ", post_id)
+        const favPost = btn.parentElement.parentElement;
+        const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+        const url = `/posts/${post_id}/favourite/toggle`;
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json"
+            }
+        }).then(response => {
+            return response.json()
+        }).then(data => {
+            if (data.status === "removed") {
+                favPost.remove()
+                showEmptyFavouritePosts()
+            }
+        })
+            .catch(error => {
+                console.error("Failed toggle favourite post: ", error);
+            })
+    }
+    function deletePost(postId) {
+        const deleteConfirmed = confirm("Do you really want to delete your post?");
+        if (deleteConfirmed) {
+            const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+            const url = `/posts/${postId}/delete/`;
+            fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/json"
+                }
+            })
+                .then(response => {
+                    if (response.status === 204) {
+                        const post = document.querySelector(`#post-${postId}`);
+                        if (post) {
+                            post.remove();
+                        }
+                    } else {
+                        console.log("Failed delete post: ", response);
+                        alert("Something went wrong. Please try again later!")
+                    }
+                }).catch(error => {
+                    console.error("Failed delete post: ", error);
+                    alert("Something went wrong. Please try again later!")
+                })
+        }
+    }
+
+</script>
+
+
+
+
+
+{% endblock %}

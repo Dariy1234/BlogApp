@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/css/reset.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+
+    {% block head %}
+    <title>BlogApp:Home</title>
+    {% endblock %}
+
+</head>
+
+<body>
+
+    <div class="nav">
+        <h2>BlogApp</h2>
+        <div class="nav-right">
+            <div class="nav-right-links">
+                <a href="{% url 'index' %}" class="nav-right-link">Home</a>
+                <a href="{% url 'all_posts' %}" class="nav-right-link">Blog</a>
+                <a href="{% url 'about_us' %}" class="nav-right-link">About Us</a>
+                
+                {% if request.user.is_authenticated %}
+                    <div class="nav-right-profile">
+                        <a href="{% url 'profile' username=request.user.username %}"
+                            class="profile-username">{{request.user.username}}</a>
+                        <a href="{% url 'logout' %}"
+                            class="nav-right-link main-btn"
+                            style="background-color: white;">Logout</a>
+                    </div>
+                    {% else %}
+                    <a href="{% url 'login' %}"
+                        class="nav-right-link main-btn">Login</a>
+                    {% endif %}
+            </div>
+            <a href class="main-btn"> Subscribe </a>
+        </div>
+    </div>
+
+
+    {% block content %}
+
+    {% endblock %}
+
+    
+
+    <footer>
+            <div class="nav">
+                <h2>BlogApp</h2>
+                <div class="nav-right">
+                    <div class="nav-right-links">
+                        <a href="{% url 'index' %}"
+                            class="nav-right-link">Home</a>
+                        <a href="{% url 'all_posts' %}"
+                            class="nav-right-link">Blog</a>
+                        <a href class="nav-right-link">About Us</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subscribe">
+                <h2>Subscribe to our news letter to get latest updates and
+                    news</h2>
+                <form class="subscribe-form">
+                    <input type="email" placeholder="Enter your email" required>
+                    <button type="submit" class="main-btn">Subscribe</button>
+                    
+                </form>
+            </div>
+            <p class="footer-copy">© 2025 BlogApp. All rights reserved.</p>
+            
+            <h6>cupindarij@gmail.com</h6>
+            <h6>073 292 9278</h6>
+        </footer>
+
+    <script>
+        // Handle missing post images
+        document.addEventListener('DOMContentLoaded', function() {
+            const postImages = document.querySelectorAll('.post-image-fallback');
+            postImages.forEach(img => {
+                // Handle image load errors
+                img.onerror = function() {
+                    this.src = '/static/images/post-image.png';
+                };
+                
+                // Check if image src is empty or invalid
+                if (!img.src || img.src === '' || img.src.includes('None') || img.src.endsWith('None')) {
+                    img.src = '/static/images/post-image.png';
+                }
+                
+                // Also handle if image fails to load
+                img.onload = function() {
+                    // Image loaded successfully
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>BlogApp:Create Post</title>
+<link rel="stylesheet" href="/static/css/create_post.css" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <div class="form-container registration">
+        <div class="background">
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+        <form method="post" 
+            autocomplete="off" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.media }}
+            <h3>Let's create new Post!</h3>
+
+            {{form.as_div}}
+
+            <button class="form-button" type="submit">Create</button>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Glassmorphism login Form Tutorial in html css</title>
+
+
+<link rel="stylesheet" href="/static/css/auth.css">
+<link rel="stylesheet" href="/static/css/profile.css">  <!-- reuse profile styles for consistent look -->
+
+
+{% endblock %}
+
+{% block content %}
+<div class='container'>
+    <div class="content-container">
+    <div class='form-container registration'>
+        <div class="background">
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+
+        <form method="post" action="{%  url 'registration'  %}">
+
+            {% csrf_token %}
+            <h3>Registration Here</h3>
+            <!-- <label for="username">Username</label>
+            <input type="text" placeholder="Username" id="username">
+
+            <label for="email">Email</label>
+            <input type="email" placeholder="Email" id="email">
+
+
+            <label for="password">Password</label>
+            <input type="password" placeholder="Password" id="password"> -->
+            {{ form.as_div }}
+            <button class="form-button" type="submit">Register</button>
+            <div class="social">
+                <div class="go"><i class="fab fa-google"></i>Google</div>
+                <div class="fb"><i class="fab fa-facebook"></i>Facebook</div>
+            </div>
+        </form>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+</html>

@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>BlogApp: Posts</title>
+<link rel="stylesheet" href="/static/css/all_posts.css" />
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+
+    <div class="posts">
+        <h1 class="posts-header">All posts!</h1>
+
+        <form method="get" class="posts-search">
+            <input type="text" name="search" placeholder="Search what you are interested in here..." value="{{ query }}" />
+            <button type="submit">
+                <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M17.5556 3C19.4579 3 21 4.54213 21 6.44444V17.5556C21 19.4579 19.4579 21 17.5556 21H6.44444C4.54213 21 3 19.4579 3 17.5556V6.44444C3 4.54213 4.54213 3 6.44444 3H17.5556Z"
+                            stroke="#000000" stroke-width="2"></path>
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M11.5067 7.01392C9.02527 7.01392 7.01367 9.02551 7.01367 11.5069C7.01367 13.9884 9.02527 16 11.5067 16C12.3853 16 13.205 15.7478 13.8973 15.3119L15.1658 16.5803C15.5563 16.9709 16.1895 16.9709 16.58 16.5803C16.9705 16.1898 16.9705 15.5566 16.58 15.1661L15.3116 13.8977C15.7475 13.2053 15.9997 12.3856 15.9997 11.5069C15.9997 9.02551 13.9881 7.01392 11.5067 7.01392ZM9.01367 11.5069C9.01367 10.1301 10.1298 9.01392 11.5067 9.01392C12.8836 9.01392 13.9997 10.1301 13.9997 11.5069C13.9997 12.8838 12.8836 14 11.5067 14C10.1298 14 9.01367 12.8838 9.01367 11.5069Z"
+                            fill="#000000"></path>
+                    </g>
+                </svg>
+            </button>
+            {% if query %}
+            <a href="{% url 'all_posts' %}{% if category_id %}&category_id={{category_id}}{% endif %}" class="clear">❌</a>
+            {% endif %}
+        </form>
+
+        <div class="categories">
+        <h2 class="categories-title">All Categories</h2>
+
+        <div class="category-list">
+            {% for category in categories %}
+            <a class="category {% if category.id == category_id %}selected{% endif %}" href="{% url 'all_posts' %}?category_id={{category.id}}{% if query %}&search={{query}}{% endif %}">
+                <div class="category-icon">{{ category.icon|safe }}</div>
+                <h3 class="category-title">{{ category.title }}</h3>
+                <p class="category-description">{{ category.short_description }}</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+        
+        <div class="post-list">
+            {% for post in posts %}
+            <a href="{% url 'post_detail' post_id=post.id %}" class="post">
+                <img src="{% if post.image %}/media/{{ post.image }}{% else %}/static/images/post-image.png{% endif %}"
+                    class="post-image post-image-fallback">
+                <div class="post-details">
+                    <p class="post-category">{{post.category.title}}</p>
+                    <h2 class="post-title">{{post.title}}</h2>
+                    <p class="post-short-description">{{post.short_description}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+       
+        
+    </div>
+
+
+
+    
+
+
+
+    {% include 'includes/join_team.html' %}
+    <div>
+        
+
+        <div class="page-buttons">
+            <p class="page-buttons-info">
+                Showing page <strong>{{posts.number}}</strong>
+                of <strong>{{posts.paginator.num_pages}}</strong>
+                ({{posts.paginator.count}} posts total)
+            </p>
+
+            <div class="page-buttons-list">
+                {% if posts.has_previous %}
+                <a href="?page=1{% if query %}&search={{query}}{% endif %}" class="page-button">
+                    &laquo; First
+                </a>
+                <a href="?page={{posts.previous_page_number}}{% if query %}&search={{query}}{% endif %}" class="page-button">
+                    &lsaquo; Prev
+                </a>
+                {% else %}
+                <span class="page-button disabled">&laquo; First</span>
+                <span class="page-button disabled">&lsaquo; Prev</span>
+                {% endif %}
+                {% for num in posts.paginator.page_range %}
+                {% if num == posts.number %}
+                <span class="page-button selected"> {{num}} </span>
+                {% else %}
+                <a href="?page={{num}}{% if query %}&search={{query}}{% endif %}" class="page-button">
+                    {{num}}
+                </a>
+                {% endif %}
+                {% endfor %}
+
+                {% if posts.has_next %}
+                <a href="?page={{posts.next_page_number}}{% if query %}&search={{query}}{% endif %}" class="page-button">
+                    Next &rsaquo;
+                </a>
+                <a href="?page={{posts.paginator.num_pages}}{% if query %}&search={{query}}{% endif %}" class="page-button">
+                    Last &raquo;
+                </a>
+                {% else %}
+                <span class="page-button disabled">Next &rsaquo;</span>
+                <span class="page-button disabled">Last &raquo;</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

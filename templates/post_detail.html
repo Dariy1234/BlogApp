@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>BlogApp:{{post.title}}</title>
+<link rel="stylesheet" href="/static/css/post_detail.css" />
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="content-container">
+        <div class="author">
+            <img src="/static/images/author.png" alt class="author-image">
+            <div class="author-name">
+                <h3>{{ post.author.username }}</h3>
+                <p>{{ post.created_at }}</p>
+            </div>
+        </div>
+
+        <div class="post-title-block">
+            <h1 class="post-title">{{ post.title }}</h1>
+            {% if user.is_authenticated %}
+            <button class="save-post" onclick="toggleFavouritePost({{post.id}},this)">
+                
+                
+                <svg width="64px" height="64px" viewBox="0 0 24 24"  xmlns="http://www.w3.org/2000/svg"
+                    {% if is_favourite %}
+                    style="fill: #FFD050;"
+                    {% endif %}>
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M17 3C18.1046 3 19 3.89543 19 5L19 19.0536C19 20.5893 17.341 21.552 16.0077 20.7901L12.9923 19.067C12.3774 18.7157 11.6226 18.7157 11.0077 19.067L7.99228 20.7901C6.65897 21.552 5 20.5893 5 19.0536L5 5C5 3.89543 5.89543 3 7 3L17 3Z"
+                            stroke="#323232" stroke-width="2" stroke-linejoin="round"></path>
+                    </g>
+                </svg>
+            </button>
+            {% else %}
+            <a href="{% url 'login' %}?next={% url 'post_detail' post_id=post.id %}" class="save-post" title="Login to save post">
+                <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M17 3C18.1046 3 19 3.89543 19 5L19 19.0536C19 20.5893 17.341 21.552 16.0077 20.7901L12.9923 19.067C12.3774 18.7157 11.6226 18.7157 11.0077 19.067L7.99228 20.7901C6.65897 21.552 5 20.5893 5 19.0536L5 5C5 3.89543 5.89543 3 7 3L17 3Z"
+                            stroke="#323232" stroke-width="2" stroke-linejoin="round"></path>
+                    </g>
+                </svg>
+            </a>
+            {% endif %}
+        </div>
+        <div class="post-category">
+            <div class="post-category-icon">{{ post.category.icon|safe }}</div>
+            <h4 class="post-category-title">{{ post.category.title }}</h4>
+        </div>
+
+        
+
+        <div class="content-container">
+            <p class="post-content">{{ post.content|safe }}</p>
+        </div>
+
+
+        <div class="comments-container" id="comments">
+            <h2>Comments:</h2>
+            <div class="background">
+                <div class="shape"></div>
+                <div class="shape"></div>
+            </div>
+            <form class="comment-form" method="post" action="{% url 'post_detail' post_id=post.id %}#comments">
+                {% csrf_token %}
+                <div class="rating-stars">
+                    <input type="radio" name="rating" value="5" id="star5">
+                    <label for="star5">
+                        <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"
+                                    stroke="#1C274C" stroke-width="1.5"></path>
+                            </g>
+                        </svg>
+                    </label>
+
+                    <input type="radio" name="rating" value="4" id="star4">
+                    <label for="star4">
+                        <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"
+                                    stroke="#1C274C" stroke-width="1.5"></path>
+                            </g>
+                        </svg>
+                    </label>
+
+                    <input type="radio" name="rating" value="3" id="star3">
+                    <label for="star3">
+                        <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"
+                                    stroke="#1C274C" stroke-width="1.5"></path>
+                            </g>
+                        </svg>
+                    </label>
+
+                    <input type="radio" name="rating" value="2" id="star2">
+                    <label for="star2">
+                        <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"
+                                    stroke="#1C274C" stroke-width="1.5"></path>
+                            </g>
+                        </svg>
+                    </label>
+
+
+                    <input type="radio" name="rating" value="1" id="star1">
+                    <label for="star1">
+                        <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                            <g id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M9.15316 5.40838C10.4198 3.13613 11.0531 2 12 2C12.9469 2 13.5802 3.13612 14.8468 5.40837L15.1745 5.99623C15.5345 6.64193 15.7144 6.96479 15.9951 7.17781C16.2757 7.39083 16.6251 7.4699 17.3241 7.62805L17.9605 7.77203C20.4201 8.32856 21.65 8.60682 21.9426 9.54773C22.2352 10.4886 21.3968 11.4691 19.7199 13.4299L19.2861 13.9372C18.8096 14.4944 18.5713 14.773 18.4641 15.1177C18.357 15.4624 18.393 15.8341 18.465 16.5776L18.5306 17.2544C18.7841 19.8706 18.9109 21.1787 18.1449 21.7602C17.3788 22.3417 16.2273 21.8115 13.9243 20.7512L13.3285 20.4768C12.6741 20.1755 12.3469 20.0248 12 20.0248C11.6531 20.0248 11.3259 20.1755 10.6715 20.4768L10.0757 20.7512C7.77268 21.8115 6.62118 22.3417 5.85515 21.7602C5.08912 21.1787 5.21588 19.8706 5.4694 17.2544L5.53498 16.5776C5.60703 15.8341 5.64305 15.4624 5.53586 15.1177C5.42868 14.773 5.19043 14.4944 4.71392 13.9372L4.2801 13.4299C2.60325 11.4691 1.76482 10.4886 2.05742 9.54773C2.35002 8.60682 3.57986 8.32856 6.03954 7.77203L6.67589 7.62805C7.37485 7.4699 7.72433 7.39083 8.00494 7.17781C8.28555 6.96479 8.46553 6.64194 8.82547 5.99623L9.15316 5.40838Z"
+                                    stroke="#1C274C" stroke-width="1.5"></path>
+                            </g>
+                        </svg>
+                    </label>
+                </div>
+                {{form.content.as_field_group}}
+                <button class="comments-button" type="submit">Create</button>
+            </form>
+        </div>
+        <div class="comments-list">
+            <h2>Comments</h2>
+            {% for comment in comments %}
+            <div class="comment" id="comment-{{comment.id}}">
+                <div class="comment-header">
+                    <p class="comment-author">{{comment.author}}</p>
+                    <p class="comment-date">{{comment.created_at}}</p>
+                </div>
+                <div class="comment-body">
+                    <div class="rating-delete">
+                        <p class="comment-rating">
+                            <strong>Rating:</strong>
+                            <span class="rating-display">
+                                {% for star in "★★★★★" %}
+                                {% if forloop.counter <= comment.rating %} <span class="star">★</span>
+                            {% else %}
+                            <span class="star" style="color: #ddd;">★</span>
+                            {% endif %}
+                            {% endfor %}
+                            </span>
+                        </p>
+                        {% if comment.author == user %}
+
+                        <button class="comment-delete" onclick="deleteComment('{{comment.id}}')">
+
+                            Delete
+                        </button>
+                        {% endif %}
+                    </div>
+                    <p class="comment-content">{{comment.content}}</p>
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #999; padding: 40px 20px; font-style: italic;">
+                No comments yet. Be the first to comment!
+            </p>
+            {% endfor %}
+        </div>
+
+        <h2>What to read next</h2>
+        <div class="similar-posts">
+            {% for post in posts_by_category %}
+            <a href="{% url 'post_detail' post.id %}" class="similar-post">
+
+                <img src="{% if post.image %}
+                        {{post.image.url}}
+                    {% else %}
+                        /static/images/post-image.png
+                    {% endif %}" alt>
+                <p class="similar-post-author">
+                    By <strong>{{post.author.username}}</strong> | {{post.created_at}}
+                </p>
+                <h3 class="similar-post-title">{{post.title}}</h3>
+                <p class="similar-post-description">{{post.short_description}}</p>
+
+            </a>
+            {% empty %}
+            <p class="simiar-not-found">
+                Similar posts not found!
+            </p>
+
+
+
+            {% endfor %}
+
+        </div>
+    </div>
+
+    {% include 'includes/join_team.html' %}
+
+</div>
+<script>
+    function deleteComment(commentId) {
+        const deleteConfirmed = confirm("Do you really want to delete your comment?");
+        if (deleteConfirmed) {
+            const csrfToken = document.querySelector('input[name=csrfmiddlewaretoken]').value;
+
+            const url = `/posts/comments/${commentId}/`;
+            fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Content-Type": "application/json"
+                }
+            }).then(response => {
+                if (response.status === 204) {
+                    console.log("Comment deleted successfully!");
+                    const comment = document.querySelector(`#comment-${commentId}`);
+                    if (comment) {
+                        comment.remove();
+                    }
+                } else {
+                    console.log("Failed delete comment: ", response);
+                }
+            }).catch(error => {
+                console.error("Failed delete comment: ", error);
+            })
+        }
+    }
+
+
+
+
+    function toggleFavouritePost(post_id){
+        console.log("Toggle post: ", post_id);
+
+        const csrfInput = document.querySelector('input[name=csrfmiddlewaretoken]');
+        if (!csrfInput) {
+            console.error('CSRF token not found on page. Make sure a csrf token input exists.');
+            return;
+        }
+        const csrfToken = csrfInput.value;
+
+        const url = `/posts/${post_id}/favourite/toggle`;
+        const btn = document.querySelector('.post-title-block .save-post');
+        if (btn) btn.disabled = true;
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrfToken,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            credentials: 'same-origin'
+        })
+        .then(async response => {
+            if (!response.ok) {
+                console.error('Failed to toggle favourite post:', response);
+                return;
+            }
+            const data = await response.json();
+            console.log('Toggle response:', data);
+
+            // Update button UI (fill heart/star) based on response
+            const svg = btn ? btn.querySelector('svg') : null;
+            if (data.status === 'saved') {
+                if (svg) svg.style.fill = '#FFD050';
+            } else if (data.status === 'removed') {
+                if (svg) svg.style.fill = 'transparent';
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling favourite post:', error);
+        })
+        .finally(() => {
+            if (btn) btn.disabled = false;
+        });
+    }
+</script>
+{% endblock %}
