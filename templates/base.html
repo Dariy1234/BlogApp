@@ -34,11 +34,15 @@
                             style="background-color: white;">Logout</a>
                     </div>
                     {% else %}
-                    <a href="{% url 'login' %}"
-                        class="nav-right-link main-btn">Login</a>
+                    <div class="nav-right-profile">
+                        <a href="{% url 'registration' %}"
+                            class="nav-right-link main-btn">Register</a>
+                        <a href="{% url 'login' %}"
+                            class="nav-right-link main-btn">Login</a>
+                    </div>
                     {% endif %}
             </div>
-            <a href class="main-btn"> Subscribe </a>
+            <a href="{% url 'create_post' %}" class="main-btn"> Create Post </a>
         </div>
     </div>
 
